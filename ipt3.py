@@ -1,4 +1,5 @@
 import openai
+import json
 import os
 import requests
 from PIL import Image
@@ -15,9 +16,20 @@ def explain(subject, context=None):
     Returns: HTML-file and JPG as an explanation
     """
 
+    # Function to load API key from JSON file 
+    def load_api_key(file_path): 
+        with open(file_path, 'r') as file: 
+            data = json.load(file) 
+            return data['openai_api_key']
+
     # Set up OpenAI API
-    openai.api_key = os.getenv('OPENAI_API_KEY')
+    openAIpath = input("Provide please your OpenAI API key - file name: ")
+    api_key = load_api_key(openAIpath)
+    openai.api_key = api_key
     
+#    if not openai.api_key:
+#        raise ValueError("API key not found. Please set the environment variable OPENAI_API_KEY.")
+
     # Generate the prompt for text explanation
     text_prompt = f"Explain, please, {subject} in Python terms (using functions, classes, loops, variables, etc.), clarifying the purpose, how it works, and its dependence with other parts of the whole system."
     if context:
@@ -89,4 +101,20 @@ def explain(subject, context=None):
     print(f"Explanation and files saved in {folder_name}.")
 
 # Example usage
-explain("beer", context="esoteric")
+# explain("beer", context="esoteric")
+
+def main():
+    while True:
+        idea = input("What do you want to understand? ")
+        if len(idea) > 1:
+            break
+        else:
+            print(f"Not so short, please.")
+
+    ctext = input("Wonna set a context?: ")
+    if len(ctext) < 1 or ctext in ["n", "N", "no", "NO", "No"]:
+        explain(idea)
+    else:
+        explain(idea, context=ctext)
+
+main()
